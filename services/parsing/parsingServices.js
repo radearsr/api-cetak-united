@@ -2,6 +2,7 @@ const regexPatterns = {
   General: "NAMA:(?<nama>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/TTAG:(?<total_tagihan>.+).",
   PLNPascabayar: "NAMA:(?<nama>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/TD:(?<tarif_daya>.+)/SM:(?<stand_meter>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/TTAG:(?<total_tagihan>.+).",
   PLNPrabayar: "INFO:(?<info>.+)/Token TMP:(?<token_tmp>.+)/RPTOKEN:(?<rp_token>.+)/PPN:(?<ppn>.+)/PPJ:(?<ppj>.+)/MATERAI:(?<materai>.+)/PLNREF:(?<pln_ref>.+);IDMeter:(?<id_meter>.+);IDPel:(?<pln_pel>.+);Admin:(?<admin>.+).",
+  AddonPlnPrabayar: "(?<token>.+)/(?<nama>[a-zA-Z\s]+)/(?<trf_daya>.+)/(?<kwh>.+)",
   BPJS: "NAMA:(?<nama>.+)/PST:(?<peserta>.+)/CBG:(?<cbg>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/TTAG:(?<total_tagihan>.+).",
   PDAM: "NAMA:(?<nama>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/SM:(?<stand_meter>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/TTAG:(?<total_tagihan>.+).",
   FNFIF: "NAMA:(?<nama>.+)/NPOL:(?<npol>.+)/TNOR:(?<tnor>.+)/PTAG:(?<ptag>.+)/JTEM:(?<jtem>.+)/TAG:(?<tag>.+)/ADM:(?<adm>.+)/TTAG:(?<ttag>.+)/DENDA:(?<denda>.+)/COLLFEE:(?<collfee>.+).",
@@ -24,10 +25,26 @@ const regenerateDataForAddRegex = (datas) => {
         regexPatterns.PLNPrabayar,
         regexPatterns.PLNPascabayar,
       );
+      const addonRegex = new RegExp(regexPatterns.AddonPlnPrabayar);
       const regex = new RegExp(regexForPln);
-      const result = data.keterangan.match(regex);
-      console.log({result});
-      return Object.assign(data, {tambahan: result.groups});
+      const { groups: result } = data.keterangan.match(regex);
+      let resultAddon;
+      try {
+        const { groups } = data.sn.match(addonRegex);
+        resultAddon = groups;
+      } catch (error) {
+        if (!error.message.includes("Cannot destructure property 'groups'")){
+          throw new Error(error.message);
+        }
+        resultAddon = null;
+      }
+      if (!resultAddon) return Object.assign(data, { tambahan: {...result } });
+      return Object.assign(data, {
+        tambahan: {
+          ...result,
+          ...resultAddon,
+        },
+      });
     } else if (data.kode_produk.includes("BYRBPJS")) {
       const regex = new RegExp(regexPatterns.BPJS);
       const result = data.keterangan.match(regex);
