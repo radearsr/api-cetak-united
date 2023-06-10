@@ -5,6 +5,7 @@ const regexPatterns = {
   AddonPlnPrabayar: "(?<token>.+)/(?<nama>[a-zA-Z\s]+)/(?<trf_daya>.+)/(?<kwh>.+)",
   BPJS: "NAMA:(?<nama>.+)/PST:(?<peserta>.+)/CBG:(?<cbg>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/TTAG:(?<total_tagihan>.+).",
   PDAM: "NAMA:(?<nama>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/SM:(?<stand_meter>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/TTAG:(?<total_tagihan>.+).",
+  PDAMSEC: "NAMA:(?<nama>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/SM:(?<stand_meter>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/DENDA:(?<denda>.+)/TTAG:(?<ttag>.+).",
   FNFIF: "NAMA:(?<nama>.+)/NPOL:(?<npol>.+)/TNOR:(?<tnor>.+)/PTAG:(?<ptag>.+)/JTEM:(?<jtem>.+)/TAG:(?<tag>.+)/ADM:(?<adm>.+)/TTAG:(?<ttag>.+)/DENDA:(?<denda>.+)/COLLFEE:(?<collfee>.+).",
   FNFIFSEC: "NAMA:(?<nama>.+)/NPOL:(?<npol>.+)/TNOR:(?<tnor>.+)/PTAG:(?<ptag>.+)/JTEM:(?<jtem>.+)/TAG:(?<tag>.+)/ADM:(?<adm>.+)/TTAG:(?<ttag>.+)."
 };
@@ -50,9 +51,14 @@ const regenerateDataForAddRegex = (datas) => {
       const result = data.keterangan.match(regex);
       return Object.assign(data, {tambahan: result.groups});
     } else if (data.kode_produk.includes("BYRPDAM")) {
-      const regex = new RegExp(regexPatterns.PDAM);
+      const regex = new RegExp(regexPatterns.PDAMSEC);
       const result = data.keterangan.match(regex);
-      return Object.assign(data, {tambahan: result.groups});
+      if (!result) {
+        const secRegex = new RegExp(regexPatterns.PDAM);
+        const alternativeResult = data.keterangan.match(secRegex);
+        return Object.assign(data, {tambahan: alternativeResult.groups });
+      }
+      return Object.assign(data, { tambahan: result.groups });
     } else if (data.kode_produk.includes("FIF")) {
       let regex = new RegExp(regexPatterns.FNFIF);
       let result = data.keterangan.match(regex);
