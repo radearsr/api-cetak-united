@@ -1,14 +1,20 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+// const fs = require("fs");
+// const https = require("https");
 
 const app = express();
 
+const portHttp = 5000;
+// const portHttps = 448;
+
 const apiRoutes = require("./routers/apiRouter");
 
+app.use('/.well-known', express.static('.well-known'));
 app.use(cors());
 
-app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use("/api", apiRoutes);
@@ -22,9 +28,18 @@ app.get("/", (req, res) => {
   }
 });
 
-const port = 5000;
-app.listen(port, () => {
-  console.log(`http://localhost:${port}`);  
+// https.createServer(
+//   {
+//     key: fs.readFileSync('/etc/letsencrypt/live/apicetak.webreports.web.id/privkey.pem'),
+//     cert: fs.readFileSync('/etc/letsencrypt/live/apicetak.webreports.web.id/cert.pem'),
+//     ca: fs.readFileSync('/etc/letsencrypt/live/apicetak.webreports.web.id/chain.pem'),
+//   },
+//   app
+// ).listen(portHttps, () => {
+//   console.log(`Listening https ${portHttps}`);
+// });
+
+app.listen(portHttp, () => {
+  console.log(`http://localhost:${portHttp}`);
 });
 
-//curl -X POST -H "Content-Type: application/json"  -d '{"tujuan": "02420187", "start_date": "2022-08-01", "end_date": "2022-12-01"}' http://localhost:9000/api/history

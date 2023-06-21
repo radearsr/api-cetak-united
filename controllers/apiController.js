@@ -1,14 +1,15 @@
 const mssqlServices = require("../services/mssql/mssqlServices");
 const parsingService = require("../services/parsing/parsingServices");
+const exception = 
 
 exports.historyTrxByTujuan = async (req, res) => {
   try {
-    const { 
+    const {
       tujuan,
       start_date,
       end_date,
-      per_page=10,
-      page=1,
+      per_page = 10,
+      page = 1,
     } = req.body;
     console.log(JSON.stringify(req.body));
     const totalData = await mssqlServices.getTotalDataSelected(tujuan, start_date, end_date, per_page);
@@ -27,11 +28,17 @@ exports.historyTrxByTujuan = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    res.statusCode = 500;
     if (error.message.includes("Timeout")) {
+      res.statusCode = 500;
       return res.json({
         status: "error",
-        message: "Request Timeout, Silahkan coba lagi beberapa saat lagi.",
+        message: "Request Timeout, silahkan coba beberapa saat lagi / hubungi cs untuk lebih lanjut.",
+      });
+    } else if (error.message.includes("KETERANGAN BERISI NULL")) {
+      res.statusCode = 400;
+      return res.json({
+        status: "fail",
+        message: "Data tidak lengkap, silahkan hubungi cs untuk mendapatkan bantuan.",
       });
     }
     res.json({
