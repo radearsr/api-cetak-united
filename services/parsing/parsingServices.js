@@ -7,7 +7,8 @@ const regexPatterns = [
   "NAMA:(?<nama>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/SM:(?<stand_meter>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/TTAG:(?<total_tagihan>.+).",
   "NAMA:(?<nama>.+)/PTAG:(?<periode>.+)/JBLN:(?<jml_bulan>.+)/SM:(?<stand_meter>.+)/TAG:(?<tagihan>.+)/ADM:(?<admin>.+)/DENDA:(?<denda>.+)/TTAG:(?<ttag>.+).",
   "NAMA:(?<nama>.+)/NPOL:(?<npol>.+)/TNOR:(?<tnor>.+)/PTAG:(?<ptag>.+)/JTEM:(?<jtem>.+)/TAG:(?<tag>.+)/ADM:(?<adm>.+)/TTAG:(?<ttag>.+)/DENDA:(?<denda>.+)/COLLFEE:(?<collfee>.+).",
-  "NAMA:(?<nama>.+)/NPOL:(?<npol>.+)/TNOR:(?<tnor>.+)/PTAG:(?<ptag>.+)/JTEM:(?<jtem>.+)/TAG:(?<tag>.+)/ADM:(?<adm>.+)/TTAG:(?<ttag>.+)."
+  "NAMA:(?<nama>.+)/NPOL:(?<npol>.+)/TNOR:(?<tnor>.+)/PTAG:(?<ptag>.+)/JTEM:(?<jtem>.+)/TAG:(?<tag>.+)/ADM:(?<adm>.+)/TTAG:(?<ttag>.+).",
+  "TOKEN:(?<token>.+)/NAMA:(?<nama>.+)/IDMeteran:(?<id_meteran>.+)/IDPel:(?<id_pelanggan>.+)/ANGSURAN:(?<angsuran>.+)/RPTOKEN:(?<rp_token>.+)/PPN:(?<ppn>.+)/PPJ:(?<ppj>.+)/MATERAI:(?<materai>.+)/PLNREF:(?<pln_ref>.+)/SM:(?<stand_meter>.+)/ADMIN:(?<admin>.+)/",
 ];
 
 const regenerateDataForAddRegex = (datas) => {
