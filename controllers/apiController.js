@@ -12,6 +12,7 @@ exports.postHistoryByDestinationController = async (req, res, next) => {
       pageSize: payload.per_page || 10,
       currentPage: payload.page || 1,
     });
+
     const resultHistoryWithAddon = regexServices.createAddonFields(
       histories.data
     );
@@ -19,7 +20,6 @@ exports.postHistoryByDestinationController = async (req, res, next) => {
       status: "success",
       message: `Berhasil menampilkan dari tujuan ${payload.tujuan}`,
       data: resultHistoryWithAddon,
-      pages: histories.page,
     });
   } catch (error) {
     next(error);

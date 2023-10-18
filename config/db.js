@@ -1,5 +1,5 @@
-require('dotenv').config();
-const { Sequelize } = require('sequelize');
+require("dotenv").config();
+const { Sequelize } = require("sequelize");
 
 const otomax = new Sequelize(
   process.env.DB_NAME,
@@ -8,18 +8,18 @@ const otomax = new Sequelize(
   {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'mssql',
+    dialect: "mssql",
     dialectOptions: {
       options: {
         encrypt: false,
         trustServerCertificate: false,
         enableArithAbort: false,
         cryptoCredentialsDetails: {
-          minVersion: 'TLSv1',
+          minVersion: "TLSv1",
         },
+        logging: false,
       },
     },
-    logging: false,
   }
 );
 
