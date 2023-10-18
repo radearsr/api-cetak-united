@@ -17,9 +17,9 @@ const otomax = new Sequelize(
         cryptoCredentialsDetails: {
           minVersion: "TLSv1",
         },
-        logging: false,
       },
     },
+    logging: false,
   }
 );
 
