@@ -1,76 +1,46 @@
-const mssqlServices = require("../services/mssql/mssqlServices");
-const parsingService = require("../services/parsing/parsingServices");
-const exception = 
+const sequelizeServices = require("../services/sequelize/sequelizeService");
+const regexServices = require("../services/regex/regexServices");
+const { formattedDate } = require("../utils/dateUtils");
 
-exports.historyTrxByTujuan = async (req, res) => {
+exports.postHistoryByDestinationController = async (req, res, next) => {
   try {
-    const {
-      tujuan,
-      start_date,
-      end_date,
-      per_page = 10,
-      page = 1,
-    } = req.body;
-    console.log(JSON.stringify(req.body));
-    const totalData = await mssqlServices.getTotalDataSelected(tujuan, start_date, end_date, per_page);
-    const histories = await mssqlServices.getAllTrxByTujuanAndDate(tujuan, start_date, end_date, page, per_page);
-    if (histories === "Not Found") {
-      return res.json({
-        status: "fail",
-        message: "Data tidak ditemukan",
-      });
-    }
-    const reformatHistories = parsingService.regenerateDataForAddRegex(histories);
-    res.json({
+    const payload = req.body;
+    const histories = await sequelizeServices.readTransactionByDestination({
+      destination: payload.tujuan || "0",
+      startDate: payload.start_date || formattedDate,
+      endDate: payload.end_date || formattedDate,
+      pageSize: payload.per_page || 10,
+      currentPage: payload.page || 1,
+    });
+    const resultHistoryWithAddon = regexServices.createAddonFields(
+      histories.data
+    );
+    res.send({
       status: "success",
-      total_page: totalData,
-      data: reformatHistories,
+      message: `Berhasil menampilkan dari tujuan ${payload.tujuan}`,
+      data: resultHistoryWithAddon,
+      pages: histories.page,
     });
   } catch (error) {
-    console.log(error.message);
-    if (error.message.includes("Timeout")) {
-      res.statusCode = 500;
-      return res.json({
-        status: "error",
-        message: "Request Timeout, silahkan coba beberapa saat lagi / hubungi cs untuk lebih lanjut.",
-      });
-    } else if (error.message.includes("KETERANGAN BERISI NULL")) {
-      res.statusCode = 400;
-      return res.json({
-        status: "fail",
-        message: "Data tidak lengkap, silahkan hubungi cs untuk mendapatkan bantuan.",
-      });
-    }
-    res.json({
-      status: "error",
-      message: "Terjadi kegagalan pada server, check log..."
-    });
-    console.error(error);
+    next(error);
   }
 };
 
-exports.printHistoryByKode = async (req, res) => {
+exports.postHistoryByIdController = async (req, res, next) => {
   try {
-    const { kodetrx } = req.body;
-    console.log(JSON.stringify(kodetrx));
-    const details = await mssqlServices.getTrxDetailsByKode(kodetrx);
-    if (details.length < 1) {
-      return res.json({
-        status: "success",
-        message: "ID tidak ditemukan, silahkan gunakan ID lain...",
-      });
-    }
-    const reformatDetails = parsingService.regenerateDataForAddRegex(details);
-    res.json({
+    const payload = req.body;
+    const history = await sequelizeServices.readTransactionByCode(
+      payload.kodetrx
+    );
+    const resultHistoryWithAddon = regexServices.createAddonFields([
+      history.data,
+    ]);
+    res.send({
       status: "success",
-      data: reformatDetails,
+      message: `Berhasil menampilkan data dari kode ${payload.kodetrx}`,
+      data: resultHistoryWithAddon,
     });
   } catch (error) {
-    res.statusCode = 500;
-    res.json({
-      status: "error",
-      message: "Terjadi kegagalan pada server, check log..."
-    });
-    console.error(error);
+    next(error);
   }
-}
+};
